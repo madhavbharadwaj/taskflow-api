@@ -30,7 +30,7 @@ This repository contains my solution to the TaskFlow API coding challenge. I've 
 
 ### Critical Issues (P0)
 
-#### 1. **Foreign Key Constraint Violation** 🚨
+#### 1. **Foreign Key Constraint Violation** 
 **Problem:** Tasks could be created with invalid `userId`, causing database constraint violations and data corruption.
 
 **Root Cause:** No validation of user existence before task creation/update operations.
@@ -52,7 +52,7 @@ async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
 }
 ```
 
-#### 2. **Circular Dependency in Entities** 🔄
+#### 2. **Circular Dependency in Entities** 
 **Problem:** User and Task entities had circular import dependencies, causing build failures.
 
 **Root Cause:** Direct class imports in `@ManyToOne` and `@OneToMany` decorators.
@@ -64,7 +64,7 @@ async create(createTaskDto: CreateTaskDto, userId: string): Promise<Task> {
 user: User;
 ```
 
-#### 3. **Test Database Connection Failures** ❌
+#### 3. **Test Database Connection Failures** 
 **Problem:** E2E tests failing with "Driver not Connected" errors.
 
 **Root Cause:** `beforeEach` creating new app instances for every test, exhausting connection pool.
@@ -83,7 +83,7 @@ beforeAll(async () => {
 
 ### High Priority Issues (P1)
 
-#### 4. **Single-Instance Cron Jobs** ⏰
+#### 4. **Single-Instance Cron Jobs** 
 **Problem:** Cron jobs would execute multiple times when running multiple instances, causing duplicate processing.
 
 **Solution:** Implemented Redis-based distributed locks (Redlock algorithm):
@@ -97,7 +97,7 @@ async checkOverdueTasks() {
 }
 ```
 
-#### 5. **Zero Observability** 🔍
+#### 5. **Zero Observability** 
 **Problem:** No visibility into production issues - impossible to debug or monitor.
 
 **Solution:** Implemented comprehensive observability:
@@ -612,7 +612,7 @@ The API should expose the following endpoints:
 
 This submission includes comprehensive documentation:
 
-### 📚 Core Documentation
+###  Core Documentation
 
 1. **[README.md](README.md)** (this file)
    - Problem analysis and solutions
@@ -640,7 +640,7 @@ This submission includes comprehensive documentation:
    - Detailed implementation analysis
    - Recommendations
 
-### 📊 Test Coverage
+###  Test Coverage
 
 - **38 E2E Tests** with 100% endpoint coverage
 - Authentication flow testing
@@ -879,6 +879,6 @@ This project is part of a coding challenge and is for evaluation purposes.
 
 ---
 
-**Built with ❤️ by Madhav Bharadwaj**
+**Built by Madhav Bharadwaj**
 
 *This submission demonstrates production-ready backend engineering with distributed systems architecture, comprehensive observability, and enterprise-grade code quality.*
