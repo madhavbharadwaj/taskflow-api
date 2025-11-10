@@ -520,7 +520,7 @@ async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/<your-username>/taskflow-api.git
+   git clone https://github.com/madhavbharadwaj/taskflow-api.git
    cd taskflow-api
    ```
 
