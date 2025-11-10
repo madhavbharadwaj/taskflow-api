@@ -15,9 +15,13 @@ import { UsersModule } from '../users/users.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get('jwt.secret'),
+        secret:
+          configService.get<string>('jwt.secret') ||
+          process.env.JWT_SECRET ||
+          'your-secret-key',
         signOptions: {
-          expiresIn: configService.get('jwt.expiresIn'),
+          expiresIn:
+            configService.get<string>('jwt.expiresIn') || process.env.JWT_EXPIRATION || '1d',
         },
       }),
     }),

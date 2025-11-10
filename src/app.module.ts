@@ -1,15 +1,20 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WinstonModule } from 'nest-winston';
+import { RedisModule } from './common/services/redis.module';
 import { UsersModule } from './modules/users/users.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TaskProcessorModule } from './queues/task-processor/task-processor.module';
 import { ScheduledTasksModule } from './queues/scheduled-tasks/scheduled-tasks.module';
-import { CacheService } from './common/services/cache.service';
+import { DistributedCacheService } from './common/services/distributed-cache.service';
+import { HealthModule } from './modules/health/health.module';
+import { CorrelationIdMiddleware } from './common/middleware/correlation-id.middleware';
+import { getLoggerOptions } from './config/logger.config';
 
 @Module({
   imports: [
@@ -17,6 +22,9 @@ import { CacheService } from './common/services/cache.service';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    
+    // Logger
+    WinstonModule.forRoot(getLoggerOptions()),
     
     // Database
     TypeOrmModule.forRootAsync({
@@ -37,6 +45,8 @@ import { CacheService } from './common/services/cache.service';
     
     // Scheduling
     ScheduleModule.forRoot(),
+  // Redis (shared)
+  RedisModule,
     
     // Queue
     BullModule.forRootAsync({
@@ -66,20 +76,17 @@ import { CacheService } from './common/services/cache.service';
     UsersModule,
     TasksModule,
     AuthModule,
+    HealthModule,
     
     // Queue processing modules
     TaskProcessorModule,
     ScheduledTasksModule,
   ],
-  providers: [
-    // Inefficient: Global cache service with no configuration options
-    // This creates a single in-memory cache instance shared across all modules
-    CacheService
-  ],
-  exports: [
-    // Exporting the cache service makes it available to other modules
-    // but creates tight coupling
-    CacheService
-  ]
+  providers: [DistributedCacheService],
+  exports: [DistributedCacheService],
 })
-export class AppModule {} 
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*');
+  }
+} 
